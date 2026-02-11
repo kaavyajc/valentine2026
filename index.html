@@ -79,19 +79,31 @@
     z-index: 1;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    transform: scale(0.95);
+    transition: opacity 0.6s ease;
   }
 
   .page.active {
     opacity: 1;
     pointer-events: auto;
-    transform: scale(1);
+  }
+
+  .page.entering {
+    animation: pageEnter 0.6s ease both;
+  }
+
+  @keyframes pageEnter {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: none; }
   }
 
   .page.exit-left {
     opacity: 0;
-    transform: translateX(-80px) scale(0.95);
+    animation: pageExit 0.5s ease both;
+  }
+
+  @keyframes pageExit {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateX(-80px) scale(0.95); }
   }
 
   .tap-hint {
@@ -409,13 +421,17 @@
     font-family: 'Caveat', cursive;
     font-size: 1.3rem;
     padding: 0.8rem 2rem;
-    background: transparent;
+    background: white;
     color: var(--rose);
     border: 2px solid var(--soft-pink);
     border-radius: 60px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-width: 100px;
+    min-height: 44px;
   }
 
   .celebration {
@@ -587,7 +603,7 @@
 
 <div class="celebration" id="celebration">
   <div class="celeb-heart">💖</div>
-  <h1 class="celeb-title">Gaaay!! 🥰</h1>
+  <h1 class="celeb-title">Gaaay!!🥰 </h1>
   <p class="celeb-subtitle">I knew you'd say yes!<br>Happy (Almost) Valentine's Day Cutie!</p>
   <p class="footer-text">made with all my love (and Claude), just for you 💕</p>
 </div>
@@ -604,14 +620,23 @@
     const oldPage = document.getElementById(`page-${currentPage}`);
     const newPage = document.getElementById(`page-${pageNum}`);
 
-    oldPage.classList.remove('active');
+    // Animate out old page
+    oldPage.classList.remove('active', 'entering');
     oldPage.classList.add('exit-left');
 
+    // Animate in new page
     setTimeout(() => {
-      newPage.classList.add('active');
+      oldPage.classList.remove('exit-left');
+      newPage.classList.add('active', 'entering');
       triggerPageAnimations(pageNum);
       updateDots(pageNum);
       currentPage = pageNum;
+
+      // Remove entering class after animation completes
+      // so no transform remains on the element
+      setTimeout(() => {
+        newPage.classList.remove('entering');
+      }, 600);
 
       if (pageNum > 0 && pageNum < 7) {
         setTimeout(() => {
@@ -623,9 +648,8 @@
     }, 300);
 
     setTimeout(() => {
-      oldPage.classList.remove('exit-left');
       isTransitioning = false;
-    }, 800);
+    }, 900);
   }
 
   function triggerPageAnimations(pageNum) {
