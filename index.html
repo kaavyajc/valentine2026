@@ -651,7 +651,7 @@
   }
 
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.btn-yes') || e.target.closest('.btn-no')) return;
+    if (e.target.closest('.btn-yes') || e.target.id === 'btnNo' || e.target.closest('.btn-no')) return;
     if (document.getElementById('celebration').classList.contains('active')) return;
 
     if (currentPage === 0) {
@@ -713,17 +713,27 @@
     const btn = document.getElementById('btnNo');
     dodgeCount++;
 
-    // Teleport instantly (no transition so it doesn't slide)
+    // Move button to body on first dodge so position:fixed works
+    // (inside a .page with transform, fixed positioning breaks)
+    if (btn.parentElement.id !== 'body-level-no') {
+      document.body.appendChild(btn);
+    }
+
+    // Teleport instantly
     btn.style.transition = 'none';
     btn.style.position = 'fixed';
-    btn.style.zIndex = '50';
+    btn.style.zIndex = '200';
+    btn.style.display = 'block';
+    btn.style.opacity = '1';
 
-    // Random position, keeping it within the viewport
-    const pad = 20;
-    const maxX = window.innerWidth - btn.offsetWidth - pad;
-    const maxY = window.innerHeight - btn.offsetHeight - pad;
-    btn.style.left = (pad + Math.random() * maxX) + 'px';
-    btn.style.top = (pad + Math.random() * maxY) + 'px';
+    // Random position within viewport
+    const pad = 30;
+    const btnW = 140;
+    const btnH = 50;
+    const newX = pad + Math.random() * (window.innerWidth - btnW - pad * 2);
+    const newY = pad + Math.random() * (window.innerHeight - btnH - pad * 2);
+    btn.style.left = newX + 'px';
+    btn.style.top = newY + 'px';
 
     // Cycle through funny texts
     btn.textContent = funnyTexts[dodgeCount % funnyTexts.length];
@@ -732,7 +742,7 @@
     const scale = Math.max(0.6, 1 - dodgeCount * 0.05);
     btn.style.transform = `scale(${scale})`;
 
-    // After lots of tries, it finally gives up and vanishes
+    // Only disappear after many many tries
     if (dodgeCount > 14) {
       btn.style.transition = 'opacity 0.5s ease';
       btn.style.opacity = '0';
