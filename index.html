@@ -603,7 +603,7 @@
 
 <div class="celebration" id="celebration">
   <div class="celeb-heart">💖</div>
-  <h1 class="celeb-title">Gaaay!!🥰 </h1>
+  <h1 class="celeb-title">Gaaay!! </h1>
   <p class="celeb-subtitle">I knew you'd say yes!<br>Happy (Almost) Valentine's Day Cutie!</p>
   <p class="footer-text">made with all my love (and Claude), just for you 💕</p>
 </div>
@@ -775,10 +775,21 @@
   }
 
   function sayYes() {
+    // Hide the No button wherever it is
+    const btnNo = document.getElementById('btnNo');
+    if (btnNo) {
+      btnNo.style.display = 'none';
+    }
+
     const celeb = document.getElementById('celebration');
     celeb.classList.add('active');
     document.getElementById('progressDots').classList.remove('visible');
     document.getElementById('tapHint').classList.remove('visible');
+
+    // Hide the No button wherever it is
+    const btn = document.getElementById('btnNo');
+    if (btn) { btn.style.display = 'none'; }
+
     launchConfetti();
     setTimeout(launchConfetti, 400);
     setTimeout(launchConfetti, 800);
